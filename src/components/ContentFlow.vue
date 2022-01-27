@@ -7,6 +7,7 @@ import {
 import { ElMessageBox } from 'element-plus'
 import { ref, onMounted, reactive } from 'vue'
 import { useStore } from "vuex"
+import { TextCopy } from '../utils/text-copy'
 
 export interface TimeLine {
   id:number,
@@ -84,6 +85,21 @@ const openEditDialog = (item:TimeLine) => {
   dialogVisible.value = !dialogVisible.value
 }
 
+const copyAction = () => {
+  let setText = ''
+  console.log(flowList)
+
+  flowList.items.forEach((item:TimeLine) => {
+    setText += `${item.numberId} \n`
+    setText += `${item.title} \n`
+    setText += `${item.disc} \n`
+    setText += `\n`
+  });
+
+  const setTxetCopy = new TextCopy(setText)
+  setTxetCopy.copy()
+}
+
 </script>
 
 <template>
@@ -94,7 +110,7 @@ const openEditDialog = (item:TimeLine) => {
           <el-icon><edit /></el-icon>
         </el-button>
       </h3>
-
+      <p class="field-caption _p_b2"><el-button @click="copyAction">テキストコピー</el-button></p>
       <el-dialog
         v-model="dialogVisible"
         title="タイムラインの追加"
@@ -136,7 +152,6 @@ const openEditDialog = (item:TimeLine) => {
             <el-card class="_relative">
               <h4 class="_p_b1">{{item.title}}</h4>
               <p class="_p_b1">{{item.disc}}</p>
-              <p class="_p_b1">{{item.time}}</p>
               <el-button class="btn" @click="openEditDialog(item)">
                 <el-icon><edit /></el-icon>
               </el-button>

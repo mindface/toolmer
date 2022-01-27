@@ -6,6 +6,7 @@ import {
 import type { VNode, VNodeProps } from 'vue'
 import { toRaw } from '@vue/reactivity'
 import { useStore, mapState } from "vuex"
+import { TextCopy } from '../utils/text-copy'
 
 interface Option {
   key: number
@@ -30,7 +31,6 @@ export default defineComponent({
       // const ll = store.getters['concept/getConceptsData'].map((item:any)=> {
       //   return {key: item.id,label: item.label,disabled: item.disabled}
       // })
-      
       return data
     }
 
@@ -56,7 +56,7 @@ export default defineComponent({
           {key: 3,label: '情報処理モデル',disabled: false},
           {key: 4,label: '情報処理モデル',disabled: false},
         ])
-    const rightValue = ref([1])
+    const rightValue = ref([2,3,4])
     const leftValue = ref([1])
     const dialogVisible = ref(false)
     const drawer = ref(false)
@@ -75,7 +75,7 @@ export default defineComponent({
       direction: 'left' | 'right',
       movedKeys: string[] | number[]
     ) => {
-      console.log(value, direction, movedKeys)
+      // console.log(value, direction, movedKeys)
     }
     const listDaialog = (item?:Option) => {
       drawer.value = true
@@ -99,11 +99,30 @@ export default defineComponent({
           }
         })
         data.value = list
-
       }else {
         data.value.push({key:data.value.length+1,label:label.value,disabled:false})
       }
       drawer.value = false
+    }
+
+    const copyAction = () => {
+      const setText = {
+        left: '',
+        right: ''
+      }
+      data.value.forEach((item:Option) => {
+        if(rightValue.value.includes(item.key)){
+          setText.right += `${item.key}\n`
+          setText.right += `${item.label}\n`
+        }else {
+          setText.left += `${item.key}\n`
+          setText.left += `${item.label}\n`
+        }
+      })
+      let copyText = `コードタスク ${setText.left} \n`
+      copyText += `終了タスク ${setText.right}\n`
+      const setTxetCopy = new TextCopy(copyText)
+      setTxetCopy.copy()
     }
 
     return {
@@ -117,7 +136,8 @@ export default defineComponent({
       renderFunc,
       handleChange,
       listDaialog,
-      setList
+      setList,
+      copyAction
     }
   }
 })
@@ -131,12 +151,13 @@ export default defineComponent({
       <el-button type="text" @click="dialogVisible = true">
         <el-icon><document /></el-icon>
       </el-button>
+      <el-button @click="copyAction">テキストコピー</el-button>
     </h3>
   </div>
   <div class="conten__body">
     <div style="text-align: center">
       <el-transfer
-        v-model="leftValue"
+        v-model="rightValue"
         style="text-align: left; display: inline-block"
         filterable
         :left-default-checked="[]"
@@ -165,10 +186,9 @@ export default defineComponent({
     title="項目リスト"
     width="40%"
   >
-      <el-button class="add-btn" type="text" @click="listDaialog()">
-        新規追加<el-icon><document /></el-icon>  
-      </el-button>
-    
+    <el-button class="add-btn" type="text" @click="listDaialog()">
+      新規追加<el-icon><document /></el-icon>  
+    </el-button>
     <div class="info">
       <ul class="info-list">
         <li class="info-item _p_1" v-for="item in data" :key="item.key">

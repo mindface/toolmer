@@ -13,7 +13,6 @@ import { ref } from 'vue'
 const navNumber = ref('0')
 
 const menuAction = (e:Event) => {
-  console.log(e)
 }
 
 </script>
